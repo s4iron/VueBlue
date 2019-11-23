@@ -1891,6 +1891,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -1898,7 +1913,8 @@ __webpack_require__.r(__webpack_exports__);
       nota: {
         nombre: '',
         descripcion: ''
-      }
+      },
+      editarActivo: false
     }; //return
   },
   //data
@@ -1929,8 +1945,50 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('/notas', params).then(function (res) {
         _this2.notas.push(res.data);
       });
-    } //agregar
+    },
+    //agregar
+    eliminarNota: function eliminarNota(item, index) {
+      var _this3 = this;
 
+      console.log(index);
+      axios["delete"]("/notas/".concat(item.id)).then(function () {
+        _this3.notas.splice(index, 1);
+      });
+    },
+    editarFormulario: function editarFormulario(item) {
+      this.editarActivo = true;
+      this.nota.nombre = item.nombre;
+      this.nota.descripcion = item.descripcion;
+      this.nota.id = item.id;
+    },
+    editarNota: function editarNota(item) {
+      var _this4 = this;
+
+      var params = {
+        nombre: item.nombre,
+        descripcion: item.descripcion
+      };
+      axios.put("/notas/".concat(item.id), params).then(function (res) {
+        var index = _this4.notas.findIndex(function (notaBuscar) {
+          return notaBuscar.id === res.data.id;
+        });
+
+        _this4.notas[index].nombre = res.data.nombre;
+        _this4.notas[index].descripcion = res.data.descripcion;
+      });
+      this.nota = {
+        nombre: '',
+        descripcion: ''
+      };
+      this.editarActivo = false;
+    },
+    cancelar: function cancelar() {
+      this.nota = {
+        nombre: '',
+        descripcion: ''
+      };
+      this.editarActivo = false;
+    }
   }
 });
 
@@ -37290,70 +37348,141 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("h3", [_vm._v("Agregar tareas")]),
-    _vm._v(" "),
-    _c(
-      "form",
-      {
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.agregar($event)
-          }
-        }
-      },
-      [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.nota.nombre,
-              expression: "nota.nombre"
-            }
-          ],
-          staticClass: "form-control mb-2",
-          attrs: { type: "text", placeholder: "Nombre" },
-          domProps: { value: _vm.nota.nombre },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+    _vm.editarActivo
+      ? _c(
+          "form",
+          {
+            on: {
+              submit: function($event) {
+                $event.preventDefault()
+                return _vm.editarNota(_vm.nota)
               }
-              _vm.$set(_vm.nota, "nombre", $event.target.value)
             }
-          }
-        }),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.nota.descripcion,
-              expression: "nota.descripcion"
-            }
-          ],
-          staticClass: "form-control mb-2",
-          attrs: { type: "text", placeholder: "Descripcion" },
-          domProps: { value: _vm.nota.descripcion },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+          },
+          [
+            _c("h3", [_vm._v("Editar")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.nota.nombre,
+                  expression: "nota.nombre"
+                }
+              ],
+              staticClass: "form-control mb-2",
+              attrs: { type: "text", placeholder: "Nombre" },
+              domProps: { value: _vm.nota.nombre },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.nota, "nombre", $event.target.value)
+                }
               }
-              _vm.$set(_vm.nota, "descripcion", $event.target.value)
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c(
-          "button",
-          { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-          [_vm._v("Agregar")]
+            }),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.nota.descripcion,
+                  expression: "nota.descripcion"
+                }
+              ],
+              staticClass: "form-control mb-2",
+              attrs: { type: "text", placeholder: "Descripcion" },
+              domProps: { value: _vm.nota.descripcion },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.nota, "descripcion", $event.target.value)
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              { staticClass: "btn btn-success", attrs: { type: "submit" } },
+              [_vm._v("Actualizar")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              { staticClass: "btn btn-danger", on: { click: _vm.cancelar } },
+              [_vm._v("Cancelar")]
+            )
+          ]
         )
-      ]
-    ),
+      : _c(
+          "form",
+          {
+            on: {
+              submit: function($event) {
+                $event.preventDefault()
+                return _vm.agregar($event)
+              }
+            }
+          },
+          [
+            _c("h3", [_vm._v("Agregar tareas")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.nota.nombre,
+                  expression: "nota.nombre"
+                }
+              ],
+              staticClass: "form-control mb-2",
+              attrs: { type: "text", placeholder: "Nombre" },
+              domProps: { value: _vm.nota.nombre },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.nota, "nombre", $event.target.value)
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.nota.descripcion,
+                  expression: "nota.descripcion"
+                }
+              ],
+              staticClass: "form-control mb-2",
+              attrs: { type: "text", placeholder: "Descripcion" },
+              domProps: { value: _vm.nota.descripcion },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.nota, "descripcion", $event.target.value)
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+              [_vm._v("Agregar")]
+            )
+          ]
+        ),
     _vm._v(" "),
     _c("hr", { staticClass: "mt-3" }),
     _vm._v(" "),
@@ -37369,8 +37498,34 @@ var render = function() {
           ]),
           _vm._v(" "),
           _c("p", [
-            _vm._v(_vm._s(item.nombre) + " :: " + _vm._s(item.descripcion))
-          ])
+            _vm._v(_vm._s(item.nombre) + " => " + _vm._s(item.descripcion))
+          ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-danger btn-sm",
+              on: {
+                click: function($event) {
+                  return _vm.eliminarNota(item, index)
+                }
+              }
+            },
+            [_vm._v("Borrrar")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-warning btn-sm",
+              on: {
+                click: function($event) {
+                  return _vm.editarFormulario(item)
+                }
+              }
+            },
+            [_vm._v("\n            Editar")]
+          )
         ])
       }),
       0
